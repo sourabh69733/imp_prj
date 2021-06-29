@@ -1,4 +1,5 @@
 const router = require("express").Router();
+const { model } = require("mongoose");
 const models = require("../mongo_models/lessons.models");
 // const LessonFeatures = require("../mongo_models/lessons.models");
 
@@ -12,7 +13,7 @@ router.route("/:id").get((req, res,next) => {
 
 router.route("/").get((req,res,next) =>{
   models.Tutorials.find()
-    .then((less) => res.json({ success: true, lessons: less }))
+    .then((less) => res.json({ lessons: less }))
     .catch((err) => res.json({ err: err }));
 });
 
@@ -53,7 +54,7 @@ router.route("/add").post((req, res, next) => {
   const links = req.body.links;
   const description = req.body.description;
   const is_popup = req.body.is_popup;
-  if (models.Tutorials.filter((item) => item.lessonId==lessonId))
+  if (models.Tutorials.find().then((item) => item.lessonId==lessonId))
   return res.json({
     success: false,
     msg: "This Id is not valid either through schema and exist already. It must be unique and descriptive to video",
@@ -78,7 +79,6 @@ router.route("/delete/:id").delete((req,res,next) =>{
   .catch((err) => res.json({msg:"try after some time or perhaps id not exit or router path add / or delete /"}));
   next();
 });
-
 router.route("/update/:id").post((req,res,next) => {
   const links = req.body.links;
   const description = req.body.description;
@@ -98,9 +98,6 @@ router.route("/update/:id").post((req,res,next) => {
   return res.json({ msg: "not success" });
 })
 
-router.route("/lessonId_update/:id").post((req,res ,next) => {
-  
-})
 module.exports = router;
 
 

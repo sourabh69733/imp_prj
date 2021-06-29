@@ -1,5 +1,6 @@
 const router = require('express').Router();
-const {Question} = require("../mongo_models/question.models")
+const models = require("../mongo_models/question.models");
+
 
 router.get("/auth-user", (req,res,next) => {
     if (req.isAuthenticated())
@@ -9,17 +10,55 @@ router.get("/auth-user", (req,res,next) => {
     next();
 })
 
-router.post("/", (req,res,next) => {
-    
-    const question_data = {
-      questionId: res.body.questionId,
-      question: res.body.array,
-      options: res.body.options,
-      answer: res.body.answer,
-      description: res.body.description,
-      tutorialLink: res.body.tutorialLink,
-    };
-    Question(question_data)
+
+router.route("/").get((req,res,next) => {
+    models.Question.find()
+    .then((ques) => res.json({ question: ques }))
+    .catch((err) => res.json({ err: "there is err internally sorry " + err }));
+})
+
+router.route("/:id").get((req,res,next) => {
+  models.Question.findById(req.params.id)
+  .then((ques) => {
+    res.json({question:ques})
+  })
+  .catch((err) => res.json({err:"there is error in data fetching "+err}));
+})
+router.post("/add", (req,res,next) => {
+     
+    const  questionId     =   req.body.questionId;
+    const  questionType   =   req.body.questionType;
+    const question        =   req.body.question;
+    const  options        =   req.body.options;
+    const  answer         =   req.body.answer;
+    const  description    =   req.body.description;
+    const  tutorialLink   =   req.body.tutorialLink;
+    let flag = false;
+
+    if (models.Question.find().then((item) => {
+      if (item.questionId === questionId)
+       flag =true
+       console.log(item.questionId === questionId);
+    }));
+    console.log(flag)
+    if (flag==true){
+        return res.json({
+          success: false,
+          msg: "This Id is not valid either through schema and exist already. It must be unique and descriptive.",
+        });
+
+    }
+    const question_data = new models.Question({
+      questionId,
+      questionType,
+      question,
+      options,
+      answer,
+      description,
+      tutorialLink,
+    });
+
+    question_data
     .save()
     .then((data) =>
     {
@@ -27,7 +66,26 @@ router.post("/", (req,res,next) => {
       )
     })
     .catch(err => res.status(400).json({succuss:false,msg:err}))
-      
+    
 })
 
+router.route("/update/:id").post((req,res,next) => {
+  models.Question.findById(req.params.id)
+  .then((ques) => {
+    if (req.body.questionType)
+    ques.questionType = req.body.questionType;
+    if (req.body.question)
+    ques.question = req.body.question;
+    if (req.body.options)
+    ques.options = req.body.options;
+    if (req.body.answers)
+    ques.answers = req.body.answers;
+    if (req.body.description)
+    ques.description = req.body.description;
+    if (req.body.tutorialLink)
+    ques.tutorialLink= req.body.tutorialLink;
+  })
+  .catch((err) => res.json(({err:"there is error "+err})))
+  return res.json({msg:"question updated successfully"})
+})
 module.exports = router;
