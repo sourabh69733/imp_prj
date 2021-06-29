@@ -8,6 +8,10 @@ const questionSchema = new Schema(
       type: String, // ex. wk1_ls1 --lesson 1 for week 1
       required: true,
     },
+    questionType:{    // Is this question for activity or practice or graded assignments or all of them. 
+      type:String,
+      required: true,
+    },
     question: {
       type: String,
       required: true,
@@ -37,4 +41,4 @@ const questionSchema = new Schema(
 );
 
 const Question = mongoose.model("Question", questionSchema);
-module.exports = Question;
+module.exports = {Question};

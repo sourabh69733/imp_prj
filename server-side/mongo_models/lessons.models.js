@@ -21,14 +21,28 @@ const userSchema = new Schema(
 
 const tutorialSchema = Schema(
   {
+    // Automatic construction from lesson and week and course 
     lessonId: {
-      type: String,
-      required: true,
+      type: String, // wk1_ls1 
+      required: false,
     },
 
-    courseId:{
+    courseId: {
+      type: String,
+      required: false,
+    },
+    //
+    lessonName:{
       type:String,
-      required: true,
+      required:true,
+    },
+    courseName: {
+      type:String,
+      required:true
+    },
+    weekName: {
+      type:String,
+      required:true,
     },
     links: {
       type: String,
@@ -47,7 +61,7 @@ const tutorialSchema = Schema(
       downvote: {
         type: Number,
         required: false,
-        default:0,
+        default: 0,
       },
       required: false,
     },
@@ -55,11 +69,11 @@ const tutorialSchema = Schema(
       type: String,
       required: false,
     },
-    is_popup:{
-      type:Boolean,
+    is_popup: {
+      type: Boolean,
       required: false,
-      default:false,
-    }
+      default: false,
+    },
   },
   {
     timestamps: true,
