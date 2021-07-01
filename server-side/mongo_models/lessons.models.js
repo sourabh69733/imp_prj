@@ -24,7 +24,7 @@ const tutorialSchema = Schema(
     // Automatic construction from lesson and week and course 
     lessonId: {
       type: String, // wk1_ls1 
-      required: false,
+      required: true,
     },
 
     courseId: {
@@ -34,15 +34,15 @@ const tutorialSchema = Schema(
     //
     lessonName:{
       type:String,
-      required:true,
+      required:false,
     },
     courseName: {
       type:String,
-      required:true
+      required:false,
     },
     weekName: {
       type:String,
-      required:true,
+      required:false,
     },
     links: {
       type: String,
