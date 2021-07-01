@@ -87,10 +87,6 @@ export function AddMoreButton(props) {
     </div>
   );
 }
-/**
- * <i class="bi bi-hand-thumbs-down"></i>
- * 
- */
 
 /*
  * Could be used with youtube vedios as measure of statisfying or not with lectures content.
@@ -100,12 +96,13 @@ export function UpvoteButton (props) {
     let [upVoteCount,setUpVoteCount] = useState(0);
     let [downVoteCount, setDownVoteCount] = useState(0);
     let [clicked , setClicked] = useState(false)
-    const user_id = props.data.user_id
-    const lesson_id = props.data.lesson_id
 
     axios
-      .get("http://localhost:8000/voteCount")
-      .then((res) => {console.log(res.upvote);  return (setUpVoteCount(res.upvote), setDownVoteCount(res.downvote))})
+      .get("http://localhost:8000/lessons/votecount/"+props.params.id)
+      .then((res) => {
+        console.log(res.upvote);
+        setUpVoteCount(res.upvote); setDownVoteCount(res.downvote);
+      })
       .catch((err) => console.log(err));
 
     const handleUpClick = (e) => {
@@ -118,8 +115,7 @@ export function UpvoteButton (props) {
         );
       }
 
-      axios.post("http://localhost:8000/lessons/votecount", {
-        lesson_id: lesson_id,
+      axios.post("http://localhost:8000/lessons/votecount/"+props.params.id, {
         downvote: downVoteCount,
         upvote: upVoteCount,
       });
@@ -135,8 +131,7 @@ export function UpvoteButton (props) {
         setDownVoteCount(() => downVoteCount--);
       }
 
-      axios.post("http://localhost:8000/lessons/votecount", {
-        lesson_id:lesson_id,
+      axios.post("http://localhost:8000/lessons/votecount/" + props.params.id, {
         downvote: downVoteCount,
         upvote: upVoteCount,
       });

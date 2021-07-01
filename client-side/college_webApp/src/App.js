@@ -1,7 +1,6 @@
 import React from 'react';
 import './styles.css';
-import { BrowserRouter as Router, Route } from "react-router-dom";
-import  AssignmentComponent from "./components/assignment";
+// import { BrowserRouter as Router, Route } from "react-router-dom";
 import WeeksComponent  from './components/weeks.component';
 import { ReadMoreButtton } from "./components/smallFunction";
 import DashboardData from "./components/dashboard";
@@ -9,20 +8,18 @@ import DashboardData from "./components/dashboard";
 
 function App() {
   const hidenContent =(
-    <p>
+    <h5>
       It is working. 
-    </p>
+    </h5>
   )
     
   return (
     <div>
       <WeeksComponent />
-      <ReadMoreButtton hiddenContent={hidenContent} />
-      <div id="question">
-        <label id="question" name="question" htmlFor="question">
-          <DashboardData id="question" />
-        </label>
-      </div>
+      {/* <ReadMoreButtton hiddenContent={hidenContent} /> */}
+      {/* <div id="questions">         */}
+          {/* <DashboardData id="question" /> */}
+      {/* </div> */}
     </div>
   );
 }
