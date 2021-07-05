@@ -1,5 +1,4 @@
 const router = require("express").Router();
-const { model } = require("mongoose");
 const models = require("../mongo_models/lessons.models");
 // const LessonFeatures = require("../mongo_models/lessons.models");
 
@@ -11,10 +10,13 @@ router.route("/:id").get((req, res,next) => {
     .catch((err) => console.log(err));
 });
 
+
 router.route("/").get((req,res,next) =>{
-  models.Tutorials.find()
-    .then((less) => res.json({ lessons: less }))
+
+    models.Tutorials.find()
+    .then((lessons) => res.json(lessons))
     .catch((err) => res.json({ err: err }));
+    
 });
 
 
@@ -50,15 +52,11 @@ router.post("/votecount/:id", (req, res, next) => {
 
 router.route("/add").post((req, res, next) => {
   
-  const lessonId = req.body.lesson_id;
+  const lessonId = req.body.lessonId;
   const links = req.body.links;
   const description = req.body.description;
   const is_popup = req.body.is_popup;
-  if (models.Tutorials.find().then((item) => item.lessonId==lessonId))
-  return res.json({
-    success: false,
-    msg: "This Id is not valid either through schema and exist already. It must be unique and descriptive to video",
-  });
+
   const lessons = new models.Tutorials({
     lessonId,
     links,
@@ -68,10 +66,10 @@ router.route("/add").post((req, res, next) => {
 
   lessons
     .save()
-    .then(() => res.json({ success: false, msg: "Lesson added succussfully!" }))
+    .then(() => res.status(200).json({msg:"added!"}))
     .catch((err) => console.log(err));
 
-  next();
+  // next();
 });
 
 router.route("/delete/:id").delete((req,res,next) =>{
@@ -80,25 +78,26 @@ router.route("/delete/:id").delete((req,res,next) =>{
   next();
 });
 router.route("/update/:id").post((req,res,next) => {
+  const id = req.body.lessonId;
   const links = req.body.links;
   const description = req.body.description;
   const is_popup = req.body.is_popup;
-  models.Tutorials.findById(req.param.id)
+  models.Tutorials.findById(req.params.id)
   .then((feature) =>{
-    if (req.body.links) feature.links = links;
-    if (req.body.description) feature.description = description;    
-    if (req.body.is_popup) feature.is_popup = is_popup;
+    if (id) feature.lessonId = id;
+    if (links) feature.links = links;
+    if (description) feature.description = description;    
+    if (is_popup) feature.is_popup = is_popup;
 
-    feature.save()
-    return res.json({ msg: "success " });
+    feature.save();
+
+    return res.json({ msg: "added successfully" });
 
   } )
-  .catch((err) => res.status(400).json({succuss:false, msg:"there are errors, try again"+err}))
-  next();
-  return res.json({ msg: "not success" });
+  .catch((err) => res.status(400).json({succuss:false, msg:"there are errors, try again"+err}));
+
+  // return res.json({ msg: "success" });
 })
 
 module.exports = router;
-
-
 

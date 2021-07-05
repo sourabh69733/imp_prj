@@ -2,15 +2,6 @@ const router = require('express').Router();
 const models = require("../mongo_models/question.models");
 
 
-router.get("/auth-user", (req,res,next) => {
-    if (req.isAuthenticated())
-    res.status(200).json({succuss:true})
-    else 
-    res.status(200).json({succuss:false})
-    next();
-})
-
-
 router.route("/").get((req,res,next) => {
     models.Question.find()
     .then((ques) => res.json({ question: ques }))
@@ -23,7 +14,8 @@ router.route("/:id").get((req,res,next) => {
     res.json({question:ques})
   })
   .catch((err) => res.json({err:"there is error in data fetching "+err}));
-})
+});
+
 router.post("/add", (req,res,next) => {
      
     const  questionId     =   req.body.questionId;
@@ -33,21 +25,7 @@ router.post("/add", (req,res,next) => {
     const  answer         =   req.body.answer;
     const  description    =   req.body.description;
     const  tutorialLink   =   req.body.tutorialLink;
-    let flag = false;
 
-    if (models.Question.find().then((item) => {
-      if (item.questionId === questionId)
-       flag =true
-       console.log(item.questionId === questionId);
-    }));
-    console.log(flag)
-    if (flag==true){
-        return res.json({
-          success: false,
-          msg: "This Id is not valid either through schema and exist already. It must be unique and descriptive.",
-        });
-
-    }
     const question_data = new models.Question({
       questionId,
       questionType,
