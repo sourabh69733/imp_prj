@@ -1,7 +1,9 @@
-import React, {useState} from 'react';
-const axios = require('axios');
-// const Vedioplayer = require("./vedioPlayer");
 
+import React, {useState, useEffect} from 'react';
+import  LessonsPlayer  from './vedioPlayer';
+import axios from "axios";
+import { Link } from 'react-router-dom';
+const root = require("./globalVar");
 
 export default function WeeksComponent(props) {
     var lessons = [
@@ -13,7 +15,7 @@ export default function WeeksComponent(props) {
   
     var weeks = ["Week 1", "Week 2", "Week 3", "Week 4"];
 
-    let [content, setContent] = useState({});
+    let [content, setContent] = useState([]);
     let [loaded, setLoaded] = useState(false);
     let [lesson, setLesson] = useState([]);
     let [idsArray, setIdsArray] = useState({});
@@ -21,23 +23,18 @@ export default function WeeksComponent(props) {
     for (let i = 0; i < lessons.length; i++) week_lessons[weeks[i]] = lessons[i];
 
     // If content not loaded, then load content form server
-    const handleLoadingContent = (e) => {
+    const handleLoadingContent = () => {
       axios
-        .get("http://localhost:8000/lessons")
+        .get(root.root_lessons)
         .then((item) => {
-          console.log(item.config)
-          item.data.map((t) => (content[t.lessonId] = t.links));
+          content.push(item.data);
+        setContent(content);
+          
         })
-        .catch((err) => setContent(null));
-      setContent(content);
+        .catch((err) => setContent(err));
+        return content
         
     };
-
-        if (!loaded) {
-          handleLoadingContent();
-          console.log(content);
-          setLoaded(true);
-        }
 
     const constructIds = (week, lesson) => {
       let week_arr = week.split(" ");
@@ -59,7 +56,7 @@ export default function WeeksComponent(props) {
       for (let i=0; i<weeks.length; i++) {
         let temp = [];
         
-        for (let j=0; j< lessons.length; j++) {
+        for (let j=0; j< lessons[i].length; j++) {
           let id = constructIds(weeks[i], lessons[i][j]);
           if (!id) {
             return false;
@@ -69,26 +66,34 @@ export default function WeeksComponent(props) {
         idsArray[weeks[i]] = temp;
         temp = [];
       }
-      setIdsArray(idsArray);
+      return setIdsArray(idsArray);
+    };
+
+    if (content.lenght === 0) {
+      handleLoadingContent();
+    }
+    if (Object.keys(idsArray).length === 0) {
+      get_ids(weeks, lessons);
+      console.log(idsArray["Week 1"], "id")
     };
 
     const handleContent = (e) => {
     const id = e.target.id;
-    let count =0;
-  
+    setLoaded(false);
+    setLesson([]); 
+    // console.log(content) 
     if (content) {
-      lesson = content.map((item) => {
-        if (item[count].lessonId === id)
-        return item[count]
-        count+=1; 
-      }
-      );
-      console.log(lesson);
-      return setLesson(lesson);
-    } else {
-      return setLesson([]);
-    };
-    };
+      lesson = content["0"].filter((item) => item["lessonId"]===id);
+      if (lesson.length!==0 ){
+        setLesson(lesson[0]);
+        loaded = true; 
+        setLoaded(loaded);
+        
+      console.log(lesson[0]["_id"], loaded);
+      }        
+    }};
+
+
 
     const handleShow = (e) => {
       const Id = e.target.value;
@@ -117,8 +122,8 @@ export default function WeeksComponent(props) {
                     return (
                       <ul className="week">
                         <button
-                          type="submit"
                           onClick={handleContent}
+                          // id={idsArray[{ week }][idsArray[{ week }].indexOf({item})]}
                           id={
                             "wk" +
                             week.split(" ")[week.split(" ").length - 1] +
@@ -129,6 +134,9 @@ export default function WeeksComponent(props) {
                         >
                           {item}
                         </button>
+                        {loaded && (
+                          <h5> {lesson[0]}</h5>
+                        )}
                       </ul>
                     );
                   })}
@@ -139,4 +147,14 @@ export default function WeeksComponent(props) {
         </div>
       </div>
     );
-}
+};
+
+/**
+ *                          <li>
+                            <Link
+                              to={"/" + lesson[0]["_id"]}
+                              link={lesson[0]["links"]}
+                            />
+                          </li>
+
+ */

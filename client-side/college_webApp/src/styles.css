@@ -173,3 +173,11 @@ font-size:40px;
   font-size:30px;
 }
 
+#course-name {
+  width:fit-content;
+  height:fit-content;
+  left:50%;
+  top:50%;
+  font-weight: bold;  
+}
+
