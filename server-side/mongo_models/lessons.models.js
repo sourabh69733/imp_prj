@@ -21,7 +21,7 @@ const userSchema = new Schema(
 
 const tutorialSchema = Schema(
   {
-    // Automatic construction from lesson and week and course 
+    // Automatic construction from lesson, week and course 
     lessonId: {
       type: String, // wk1_ls1 
       required: true,
@@ -46,7 +46,7 @@ const tutorialSchema = Schema(
     },
     links: {
       type: String,
-      required: true,
+      required: false,
     },
     description: {
       type: String,
