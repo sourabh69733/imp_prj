@@ -1,29 +1,134 @@
 /**
- * It is act like data source for our page. through it user can input number of weeks and lesssons of week and vedio link of each of them. It is also
- * All data collected data make website more dynamic. It is act like graded assignment and has features of add question, options and answer
- * button to check question, we also store it.
+ * Admin can input number of weeks and lesssons of week and vedio link of each of them. 
+ * Focus to give more flexibility in adding
  */
 
 
 import React, {Component} from 'react';
 import axios from 'axios';
+const root = require("./globalVar");
 
 // import { AddMoreButton } from "./smallFunction";
-function constructIds(name, type) {
+function constructIds (name, type) {
   if (type==="course"){
-    if (name.contains("maths"))
+    if (name.match("maths"))
     return "math101"
-    if (name.contains("statistics"))
+    if (name.match("statistics"))
     return "stats101"
-    if (name.contains("python"))
+    if (name.match("python"))
     return "python101"
-    if (name.contains("english"))
+    if (name.match("english"))
     return "english101"
-  }
-  if (type==="lessons"){
 
+    return "other101"
   }
 }
+
+
+class DashboardHelper extends Component {
+  constructor(props) {
+    super(props);
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.state = {
+      courseName: "",
+      weekNumber: 0,
+      weekName: "", //  format dict of  key --wk1_ls1, value --wk1_ls1 (Array type)
+      lessonNumber: 0,
+      lessonName: "",
+    };
+  }
+  handleSubmit(e) {
+    axios.post(root.root_lessons, {
+      lessonId:
+        "wk" +
+        String(this.state.weekNumber) +
+        "_ls" +
+        String(this.state.lessonNumber),
+      courseName: this.state.courseName,
+      weekName: this.state.weekName,
+      lessonName: this.state.lessonName,
+    });
+    return true;
+  }
+
+  render() {
+    return (
+      <div>
+        <form onSubmit={this.handleSubmit}>
+          <label name="course_name" id="course_name_label">
+            Course Name
+            <input
+              name="course_name"
+              id="course_name_input"
+              placeholder="Please Type Course name"
+              value={this.state.courseName}
+              onChange={(e) => {
+                this.setState({
+                  courseName: e.target.value,
+                });
+              }}
+              required
+            />
+          </label>
+          <label name="week" id="week">
+            Week Number
+            <input
+              name="week"
+              id="week_number"
+              value={this.state.weekNumber}
+              onChange={(e) => {
+                this.setState({
+                  weekNumber: e.target.value,
+                });
+              }}
+              required
+            />
+            Week Name
+            <input
+              name="week"
+              id="week_name"
+              value={this.state.weekName}
+              onChange={(e) => {
+                this.setState({
+                  weekName: e.target.value,
+                });
+              }}
+              required
+            />
+          </label>
+          <label name="lesson" id="lesson">
+            Lesson Number
+            <input
+              name="lesson"
+              id="lesson_number"
+              value={this.state.lessonNumber}
+              onChange={(e) => {
+                this.setState({
+                  lessonNumber: e.target.value,
+                });
+              }}
+              required
+            />
+            Lesson Name
+            <input
+              name="lesson"
+              id="lesson_name"
+              value={this.state.lessonName}
+              onChange={(e) => {
+                this.setState({
+                  lessonName: e.target.value,
+                });
+              }}
+              required
+            />
+          </label>
+        </form>
+      </div>
+    );
+  }
+}
+
+
 
 export default class DashboardInput extends Component {
   constructor(props) {
@@ -32,19 +137,11 @@ export default class DashboardInput extends Component {
     this.handleClick = this.handleClick.bind(this);
     this.validator = this.validator.bind(this);
     this.state = {
-      courses: [],
-      temp_options: [],
       clicked: false,
-      courseName: [],
-      courseButton: false,
-      weekButton: false,
-      lessonButton: false,
-      weeks: [], //  format dict of  key --wk1_ls1, value --wk1_ls1 (Array type)
-      lessonName: [],
-      links: [], //  format dict of key --questionId, value --question (String Type)
-      is_popup: [],
-      description: [], //  format dict of key --questionId, value --options (array of strings )
-      answers: [], //  format dict of key --questionId, value --answer (String Type)
+      links: "", //  format dict of key --questionId, value --question (String Type)
+      is_popup: false,
+      description: "", //  format dict of key --questionId, value --options (array of strings )
+      answers: "", //  format dict of key --questionId, value --answer (String Type)
     };
   };
 
@@ -53,20 +150,24 @@ export default class DashboardInput extends Component {
   }
 
   handleSubmit() {
-    const values = document.getElementById("course_name").value;
-    this.state.courses.push(values);
-    const course_id = this.state.courseName
-    if (this.state.courseButton){
+
       axios
-      .post("http://localhost:8000/lessons/add",{
-        courseId:this.state.courseName
-      })
-    }
-    this.setState({
-      courseName:'',
-      courses: this.state.courses,
-      clicked:true
-    });
+        .post("http://localhost:8000/lessons/add", {
+          lessonId:
+            "wk" +
+            String(this.state.weekNumber) +
+            "_ls" +
+            String(this.state.lessonNumber),
+          courseName: this.state.courseName,
+          weekName: this.state.weekName,
+          lessonName: this.state.lessonName,
+          links: this.state.links,
+          is_popup: this.state.is_popup,
+          description: this.state.description,
+        })
+        .then((res) => res.json({ msg: "succesfull add" }))
+        .catch((err) => console.log(err));
+      
   };
 
   handleClick(e) {
@@ -76,99 +177,85 @@ export default class DashboardInput extends Component {
       </div>
     );
   };
-
-  
+// https://youtu.be/1l83L1ZKF5k
+// https://www.youtube.com/embed/1l83L1ZKF5k
 
   render() {
     return (
-      <div>
-        <div>
-          <label htmlFor="course_name" name="course_name" id="course_name">
-            Course name
-            <input
-              type="text"
-              name="course_name"
-              id="course_name"
-              value={this.state.courseName}
-              onChange={(e) => {
-                this.setState({ courseName: e.target.value });
-              }}
-            />
-          </label>
-          <label htmlFor="lesson_name" name="lesson_name" id="lesson_name">
-            Lesson name
-            <input
-              type="text"
-              name="lesson_name"
-              id="lesson_name"
-              value={this.state.lessonName}
-              onChange={(e) => {
-                this.setState({ lessonName: e.target.value });
-              }}
-            />
-            <input
-              type="number"
-              name="lesson_name"
-              id="lesson_number"
-              onChange={(e) => this.state.lessonName+e.target.value}
-            />
-          </label>
-          <label htmlFor="week_name" name="week_name" id="week_name">
-            Week name
-            <input
-              type="text"
-              name="week_name"
-              id="week_name"
-              value={this.state.weekName}
-              onChange={(e) => {
-                this.setState({ weekName: e.target.value });
-              }}
-            />
-          </label>
-        </div>
-        <div>
-          <label htmlFor="lesson_link" name="lesson_link" id="lesson_link">
-            <input
-              placeholder="Please type your lesson video link"
-              type="text"
-              name="lesson_link"
-              id="lesson_link"
-              value={this.state.lessonLinks}
-              onChange={(e) => {
-                this.setState({ lessonLinks: e.target.value });
-              }}
-            />
-          </label>
-          <label htmlFor="description" name="description" id="description">
-            <input
-              placeholder="Please add description about lesson"
-              type="text"
-              name="description"
-              id="description"
-              value={this.state.description}
-              onChange={(e) => {
-                this.setState({ description: e.target.value });
-              }}
-            />
-          </label>
-          <label
-            htmlFor="is_popup_lesson"
-            name="is_popup_lesson"
-            id="is_popup_lesson"
-          >
-            <input type="radio" value={true} name="is_popup_lesson" />
-            <input type="radio" value={false} name="is_popup_lesson" />
-          </label>
-        </div>
-        <div>
-          <button
-            type="submit"
-            onClick={() => this.setState({ courseButton: true })}
-            onSubmit={this.handleSubmit}
-          >
-            Submit
-          </button>
-        </div>
+      <div style={{ margin: "10px" }}>
+        <form onSubmit={this.handleSubmit} action="/">
+          <div style={{ margin: "20px", padding: "10px" }}>
+            <DashboardHelper />
+            
+          </div>
+          <div style={{ margin: "20px", padding: "20px" }}>
+            <label htmlFor="lesson_link" name="lesson_link" id="lesson_link">
+              <input
+                placeholder="Please type your lesson video link"
+                type="text"
+                name="lesson_link"
+                id="lesson_link"
+                value={this.state.links}
+                onChange={(e) => {
+                  this.setState({ links: e.target.value });
+                }}
+                required
+              />
+            </label>
+            <label htmlFor="description" name="description" id="description">
+              <input
+                placeholder="Please add description about lesson"
+                type="text"
+                name="description"
+                id="description"
+                value={this.state.description}
+                onChange={(e) => {
+                  this.setState({ description: e.target.value });
+                }}
+              />
+            </label>
+            <div style={{ margin: "20px", padding: "10px", display: "flex" }}>
+              <label
+                htmlFor="is_popup_lesson"
+                name="is_popup_lesson"
+                id="is_popup_lesson"
+              >
+                Do you want pop up in vedio?
+                <label>
+                  True
+                  <input
+                    type="radio"
+                    value={this.state.is_popup}
+                    name="is_popup_lesson"
+                    onChange={() => {
+                      this.setState({
+                        is_popup: true,
+                      });
+                    }}
+                  />
+                </label>
+                <label>
+                  False
+                  <input
+                    type="radio"
+                    value={this.state.is_popup}
+                    name="is_popup_lesson"
+                    onChange={() => {
+                      this.setState({
+                        is_popup: false,
+                      });
+                    }}
+                  />
+                </label>
+              </label>
+            </div>
+          </div>
+          <div>
+            <button type="submit" onClick={this.handleSubmit}>
+              Submit
+            </button>
+          </div>
+        </form>
       </div>
     );
   };

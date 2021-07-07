@@ -9,20 +9,19 @@ export default class LessonsPlayer extends Component {
     super(props);
     // this.componentDidMount = this.componentDidMount.bind(this);
     this.state = {
-      links:this.props.link,
-      source:this.props.id,
-      
+      links: this.props.link,
     };
   }
-  // componentDidMount() {
-    // axios.get(root.root_lessons+this.state.source)
-    // .then((less) => {
-      // this.setState({
-        // links:less.data.data.links
-      // })
-    // })
-    // .catch((error) => error);
-  // };
+  componentDidMount() {
+    axios
+      .get(root.root_lessons + this.props.match.params.id)
+      .then((less) => {
+        this.setState({
+          links: less.data.data.links,
+        });
+      })
+      .catch((error) => error);
+  };
 
   
   render() {
