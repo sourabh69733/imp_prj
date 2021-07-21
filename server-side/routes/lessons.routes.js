@@ -4,7 +4,7 @@ const models = require("../mongo_models/lessons.models");
 
 
 router.route("/:id").get((req, res,next) => {
-
+  
   models.Tutorials.findById(req.params.id)
     .then((lessons) => res.json({ data: lessons }))
     .catch((err) => console.log(err));
@@ -19,6 +19,12 @@ router.route("/").get((req,res,next) =>{
     
 });
 
+router.route("/admin/coursecount").get((req,res,next) => {
+
+  models.CourseFeatures.findById("60ef2505401693328c169f97")
+    .then((week_count) => res.json(week_count))
+    .catch((err) => console.log(err));
+});
 
 router.route("/feedback/:id").post((req,res,next) => {
 
@@ -56,12 +62,20 @@ router.route("/add").post((req, res, next) => {
   const links = req.body.links;
   const description = req.body.description;
   const is_popup = req.body.is_popup;
+  const courseId = req.body.courseId;
+  const lessonName = req.body.lessonName;
+  const weekName = req.body.weekName;
+  const courseWeekCount = parseInt(req.body.weekNumber);
+  const courseLessonCount = parseInt(req.body.lessonNumber);
 
   const lessons = new models.Tutorials({
     lessonId,
     links,
     description,
     is_popup,
+    courseId,
+    lessonName,
+    weekName,
   });
 
   lessons
@@ -69,14 +83,51 @@ router.route("/add").post((req, res, next) => {
     .then(() => res.status(200).json({msg:"added!"}))
     .catch((err) => console.log(err));
 
-  // next();
+  /**
+   * only reqirement for storing number of courses values in database, 
+   */
+  models.CourseFeatures.findById("60ef2505401693328c169f97")
+    .then((feature) => {
+      (feature.courseLessonCount = courseLessonCount),
+        (feature.courseWeekCount = courseWeekCount);
+
+      feature.save();
+    })
+    .catch((err) =>
+      console.log(err)
+    );
+
 });
 
 router.route("/delete/:id").delete((req,res,next) =>{
-  models.findByIdAndDelete(req.params.id).then(() => res.json({msg:"deleted successfully "+req.params.id}))
-  .catch((err) => res.json({msg:"try after some time or perhaps id not exit or router path add / or delete /"}));
+  models
+    .Tutorials.findByIdAndDelete(req.params.id)
+    .then(() => res.json({ msg: "deleted successfully " + req.params.id }))
+    .catch((err) =>
+      res.json({
+        msg: "try after some time or perhaps id not exit or router path add / or delete /",
+      })
+    );
   next();
 });
+
+// C:\\Users\gaurav sahu\Desktop\mysql_pass.txt
+router.route("/delete").delete((req,response,next) => {
+  models.Tutorials.deleteMany()
+    .then((res) => response.json(res))
+    .catch((err) => console.log(err));
+    models.CourseFeatures.findById("60ef2505401693328c169f97")
+      .then((feature) => {
+        (feature.courseLessonCount = 1),
+          (feature.courseWeekCount = 1);
+
+        feature.save();
+      })
+      .catch((err) => console.log(err));
+
+});
+
+
 router.route("/update/:id").post((req,res,next) => {
   const id = req.body.lessonId;
   const links = req.body.links;
@@ -96,8 +147,19 @@ router.route("/update/:id").post((req,res,next) => {
   } )
   .catch((err) => res.status(400).json({succuss:false, msg:"there are errors, try again"+err}));
 
-  // return res.json({ msg: "success" });
 })
 
 module.exports = router;
+
+/***
+ *   models.CourseFeatures.findById("60edddd485514b323c6c5d95")
+  .then((feature) =>{
+      feature.courseWeekCount =   courseWeekCount,
+      feature.courseLessonCount = courseLessonCount;
+      feature.save();
+      return res.json({msg:"added"})
+  })
+  .catch((err) => console.log(err));
+
+ */
 

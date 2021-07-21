@@ -21,9 +21,9 @@ const userSchema = new Schema(
 
 const tutorialSchema = Schema(
   {
-    // Automatic construction from lesson, week and course 
+    // Automatic construction from lesson, week and course
     lessonId: {
-      type: String, // wk1_ls1 
+      type: String, // wk1_ls1
       required: true,
     },
 
@@ -32,17 +32,13 @@ const tutorialSchema = Schema(
       required: false,
     },
     //
-    lessonName:{
-      type:String,
-      required:false,
-    },
-    courseName: {
-      type:String,
-      required:false,
+    lessonName: {
+      type: String,
+      required: false,
     },
     weekName: {
-      type:String,
-      required:false,
+      type: String,
+      required: false,
     },
     links: {
       type: String,
@@ -73,29 +69,34 @@ const tutorialSchema = Schema(
       type: Boolean,
       required: false,
       default: false,
-      
     },
-
   },
   {
     timestamps: true,
   }
 );
 
-const lessonFeatures = Schema(
+const courseFeatures = Schema(
   {
-    lessonId: {
+    courseId: {
       type: String,
       required: true,
     },
+    courseWeekCount: {
+      type: Number,
+      required: false,
+    },
+    courseLessonCount: {
+      type: Number,
+      required: false,
+    },
   },
-  {
-    timestamps: true,
-  }
 );
+
+
 const User = mongoose.model("User", userSchema);
 const Tutorials = mongoose.model("Tutorials", tutorialSchema);
-const LessonFeatures = mongoose.model("lessonFeatures", lessonFeatures);
-module.exports = { User, LessonFeatures, Tutorials };
+const CourseFeatures = mongoose.model("courseFeatures", courseFeatures);
+module.exports = { User, CourseFeatures, Tutorials };
 // module.exports = LessonFeatures;
 // module.exports = Tutorials;
