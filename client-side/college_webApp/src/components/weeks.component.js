@@ -47,7 +47,7 @@ export default function WeeksComponent(props) {
         lesson.slice(less_idx, lesson.length)
       );
     };
-
+    
     const get_ids = (weeks, lessons) => {
 
       for (let i=0; i<weeks.length; i++) {
@@ -81,7 +81,6 @@ export default function WeeksComponent(props) {
         setLesson(lesson[0]);
         loaded = true; 
         setLoaded(loaded);
-        
       }        
     }};
 
@@ -103,7 +102,6 @@ export default function WeeksComponent(props) {
                 <button onClick={handleShow} value={week}>
                   {week}
                 </button>
-
                 <div
                   id={week}
                   name={week}
