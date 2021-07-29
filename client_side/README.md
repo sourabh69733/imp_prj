@@ -15,13 +15,11 @@ The page will reload if you make edits.\
 You will also see any lint errors in the console.
 
 ## Structure 
-
-It should be developer freindly website where one can customize it as much as he can with as providing them as much ease as much ae required and possible. 
-Focus areas are Speed-- faster and better, performance and features which are really usefull, that one can easily navigate and use them. Buiding tracker and machine learning powered features, that are helpfull for students and instructor. Video player and also podcast player, lessons tab and quizes and assignments with some more usefull features like time bounding and video timestamp of that concept or form questions associated with that concept.
+Working
 
 ### Use of Main technology:
 
-*  Express for backend server routing and database. Including basic API calls.
+*  Express for backend server, middleware and routing. Including basic API calls.
 *  React for fronted-development and UI component management.
 *  GraphQL for API calls data fecthing and it make code simple, cleaner. I learn and build, as I don't have used it before. 
 *  Mongodb database for all unrelational data like watch hours of vedios and likes. And other things like manngaing relationaship between user.
