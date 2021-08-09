@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import { Link, useParams} from "react-router-dom";
 const axios = require("axios");
 const root = require("./globalVar");
 
@@ -57,8 +56,3 @@ export default class LessonsPlayer extends Component {
   }
 }
 // https://www.youtube.com/embed/t6PA2E_G0do
-
-
-/**
-
- */

@@ -1,27 +1,18 @@
-/**
- * Admin can input number of weeks and lesssons of week and vedio link of each of them. 
- * Focus to give more flexibility in adding
- */
-
-
 import React, {Component} from 'react';
 import axios from 'axios';
+import  Validator  from "./form_validator";
+import { FormFieldsFunction } from "./form.component";
+
 const root = require("./globalVar");
 
-// import { AddMoreButton } from "./smallFunction";
-/**
- * componentdidmount and componentwillmount --
- */
 
 export default class DashboardInput extends Component {
   constructor(props) {
     super(props);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleClick = this.handleClick.bind(this);
-    this.validator = this.validator.bind(this);
     this.handleNumberClick = this.handleNumberClick.bind(this);
     this.componentDidMount = this.componentDidMount.bind(this);
-
     this.state = {
       courses: [["Mathematics"], ["Python"], ["Statistics"], ["English"]],
       courseMap: {
@@ -31,7 +22,7 @@ export default class DashboardInput extends Component {
         English: "english101",
       },
       count: 0,
-      weekNumber: 1,
+      weekNumber:2 ,
       weekName: "intro",
       lessonId: "wk1_ls1",
       lessonName: "intro",
@@ -41,59 +32,50 @@ export default class DashboardInput extends Component {
       is_popup: false, // bool
       description: "It is in test",
     };
-  }
-  /**
-   * course, week number , week name, lesson number, lesson name, +6
-   */
-  componentDidMount() {
-    axios
-      .get(root.root_lessons+"admin/coursecount")
-      .then((res) => {
-        if (
-          !res.data.courseLessonCount 
-        )
-          return false;
-        if (
-          !res.data.courseWeekCount 
-        )
-          return false;
-        console.log(res.data, " this is not working")
-        this.setState(() => {
-          console.log(res.data)
-          return {
-            weekNumber: res.data.courseWeekCount,
-            lessonNumber: res.data.courseLessonCount+1,
-          };
-        });
-      })
-      .catch((err) => console.log(err));
-      document.getElementById('btn-submit').innerHTML.disabled= true;
-      // console.log(this.state.weekNumber, this.state.lessonNumber)
-  }
 
-  validator() {
-    const arr = [
+    this.forms_fields = FormFieldsFunction(this.state, this)
+    this.state_array = [
+      this.state.weekNumber,
       this.state.weekName,
-      this.state.lessonId,
+      this.state.lessonNumber,
       this.state.lessonName,
       this.state.links,
-      this.state.courseId,
+      this.state.description,
+      this.state.is_popup,
     ];
-    for (let i of arr) {
-      if (i === "") {
-        return false;
-      }
-    }
-    return true;
-  }
+    this.state_array_index = [];
+    for (let i=0; i<this.forms_fields.length; i++){
+      this.state_array_index.push(i);
+    };
+
+  };
+
+  componentDidMount() {
+      console.log(Object.keys(this.state).length)
+      axios
+        .get(root.root_lessons + "admin/coursecount")
+        .then((res) => {
+          if (!res.data.courseLessonCount) return false;
+          if (!res.data.courseWeekCount) return false;
+          console.log(res.data, " this is not working");
+          this.setState(() => {
+            console.log(res.data);
+            return {
+              weekNumber: res.data.courseWeekCount,
+              lessonNumber: res.data.courseLessonCount + 1,
+            };
+          });
+        })
+        .catch((err) => console.log(err));
+  };
 
   handleSubmit(e) {
     e.preventDefault();
 
-    if (!this.validator()) {
+    if (!Validator(this.state)) {
       alert("Please check your field ");
       return false;
-    };
+    }
 
     axios
       .post(root.root_lessons + "add", {
@@ -109,21 +91,18 @@ export default class DashboardInput extends Component {
       })
       .then((res) => console.log(res.data.msg))
       .catch((err) => console.log(err));
-  };
+  }
 
   handleClick() {
     this.setState((state) => {
       return {
         lessonId:
-          "wk" +
-          String(state.weekNumber) +
-          "_ls" +
-          String(state.lessonNumber),
+          "wk" + String(state.weekNumber) + "_ls" + String(state.lessonNumber),
       };
     });
   };
 
-  handleNumberClick(e){
+  handleNumberClick(e) {
     if (e.target.value - this.state.weekNumber === 1) {
       return false;
     } else {
@@ -132,11 +111,11 @@ export default class DashboardInput extends Component {
           weekNumber: state.weekNumber + 1,
         };
       });
-    };
+    }
   };
 
   // https://www.youtube.com/embed/me3_XR7Iz60
-
+  // [[name, id, value, onc1], [name, id, value, onc1]]
   render() {
     return (
       <div style={{ margin: "10px" }}>
@@ -162,94 +141,26 @@ export default class DashboardInput extends Component {
                 })}
               </select>
             </div>
-            <label
-              htmlFor="week_number"
-              name="week_number"
-              id="week_number_label"
-            >
-              Week Number
-              <input
-                placeholder="Please type week Number"
-                type="number"
-                name="week_number"
-                id="week_number"
-                value={this.state.weekNumber}
-                onClick= {this.handleNumberClick}
-              />
-            </label>
-
-            <label htmlFor="week_name" name="week_name" id="week_label">
-              <input
-                placeholder="Please type your week name"
-                type="text"
-                name="week_name"
-                id="week_name"
-                value={this.state.weekName}
-                onChange={(e) => {
-                  this.setState({ weekName: e.target.value });
-                }}
-                required
-              />
-            </label>
-            <label
-              htmlFor="lesson_number"
-              name="lesson_number"
-              id="lesson_number_label"
-            >
-              Lesson Number
-              <input
-                placeholder="Please type your lesson Number"
-                type="number"
-                name="lesson_number"
-                id="lesson_number"
-                value={this.state.lessonNumber}
-              />
-            </label>
-
-            <label
-              htmlFor="lesson_name"
-              name="lesson_name"
-              id="lesson_name_label"
-            >
-              <input
-                placeholder="Please type your lesson Name"
-                type="text"
-                name="lesson_name"
-                id="lesson_name"
-                value={this.state.lessonName}
-                onChange={(e) => {
-                  this.setState({ lessonName: e.target.value });
-                }}
-                required
-              />
-            </label>
-          </div>
-          <div style={{ margin: "20px", padding: "20px" }}>
-            <label htmlFor="lesson_link" name="lesson_link" id="lesson_link">
-              <input
-                placeholder="Please type your lesson video link"
-                type="text"
-                name="lesson_link"
-                id="lesson_link"
-                value={this.state.links}
-                onChange={(e) => {
-                  this.setState({ links: e.target.value });
-                }}
-                required
-              />
-            </label>
-            <label htmlFor="description" name="description" id="description">
-              <input
-                placeholder="Please add description about lesson"
-                type="text"
-                name="description"
-                id="description"
-                value={this.state.description}
-                onChange={(e) => {
-                  this.setState({ description: e.target.value });
-                }}
-              />
-            </label>
+            {this.state_array_index.map((index) => {
+              return (
+                <label
+                htmlFor={this.forms_fields[index][0]}
+                name= {this.forms_fields[index][0]}
+                id={this.forms_fields[index][0]}
+                >
+                {this.forms_fields[index][0]}
+                <input
+                type={this.forms_fields[index][1]}
+                name={this.forms_fields[index][0]}
+                id={this.forms_fields[index][0]}
+                value={this.state_array[index]}              // It is not working as expected, only way is to make it in component and formik
+                onClick= {this.forms_fields[index][3]}
+                onChange= {this.forms_fields[index][4]}
+                
+                />
+                </label>
+              );
+            })}
             <div style={{ margin: "20px", padding: "10px", display: "flex" }}>
               <label
                 htmlFor="is_popup_lesson"
